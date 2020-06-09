@@ -29,6 +29,8 @@
             margin-bottom:15px;
         }
 
+
+
         #resultats{
 		text-align:left;
 		border: 8px outset rgb(196, 193, 193) ;
@@ -44,41 +46,72 @@
 
 </head>
 <body>
+<div id="app">    
     <div class="header" class="row">
-		<div class="col-xs-12 col-md-12 col-lg-12">
+		<div class="col-xs-12 ">
 			<h1>API</h1>
 		</div>
 	</div>
 	<div class="nav" class="row">
 		<ul>
-			<div class="col-xs-3 col-md-3 col-lg-2">
+			<div class="col-xs-3 col-lg-2">
 				<li><a href="#">Accueil</a></li>
-			</div>
-            <form action="api.html" method="POST">
-                <input v-model="recherche1" placeholder="Search.." name="search">
-                <button type="submit">recherche</button>
-              </form>		
-		</ul>
-	</div>
-    <div id="app">
-     {{ cryptomonnaie }}   
-    <h1>API CryptoCompare</h1>
-      <div class="row">
-		<div v-for="currency in resultat" class="col-xs-12 col-md-10 col-md-offset-1  col-lg-3 col-lg-offset-2 ">
-            <div id="resultats"
+            </div>
+        </ul>
+    </div>
+ <h1>API CryptoCompare</h1>
+ <!-- pour voir qu'elles sont les données reçu -->
+ <div v-for="crypto in cryptomonnaie">
+{{crypto}}
 
-            class="currency"
-            >
-				<h4>{{ recherche1 }}:</h4>
+</div>    
+      
+<div class="row">
+    <div id="recherche" class="col-xs-5 offset-xs-1 col-md-10 offset-md-1  col-lg-3 offset-lg-2 ">
+        <label for="cryptomonnaie">Choisir la cryptomonnaie:</label>
+        <select v-model="recherche1" id="cryptomonnaie" name="cryptomonnaie">
+            <div v-for="crypto in cryptomonnaie">
+                <option></option>
+            </div>    
+        </select>
+      </div>
+      <div id="recherche" class="col-xs-5 offset-xs-1 col-md-5 offset-md-1  col-lg-3 offset-lg-2 ">
+        <label for="cryptomonnaie">Choisir la cryptomonnaie:</label>
+        <select v-model="recherche1" id="cryptomonnaie" name="cryptomonnaie">
+            <div v-for="crypto in cryptomonnaie">
+                 <!-- {{crypto.symbol}} ne fonctionne pas alors que crypto contient toutes les datas comme je le faisais avec cryptomonnaieAffiche -->
+                <option></option>
+            </div>    
+        </select>
+      </div>   
+    </div>
+    <button @click="recherche">recherche</button>
+        		
+		
+    
+      
+   
+        <div class="row">
+          <div id="cryptotitre" class="col-xs-5 offset-xs-1 col-md-5 offset-md-1  col-lg-3 offset-lg-2 ">
+              <h4>{{ recherche1 }}:</h4>
+            </div>
+            <div id="cryptotitre" class="col-xs-5 offset-xs-1 col-md-5 offset-md-1  col-lg-3 offset-lg-2 ">
+              <h4>{{ recherche2 }}:</h4>
+            </div>   
+        </div>
+        <div class="row">
+            <div v-for="cryptomonnaieAffiche in resultat" class="col-xs-5 offset-xs-1 col-md-4 offset-md-1  col-lg-3 offset-lg-2 ">
+            <div id="resultats">
+				
 				<ul>
-                    <li>${{ currency.USD }}</li>
-                    <li>€{{ currency.EUR }}</li>
-                    <li>£{{ currency.GBP }}</li>
+                    <li>${{ cryptomonnaieAffiche.USD }}</li>
+                    <li>€{{ cryptomonnaieAffiche.EUR }}</li>
+                    <li>£{{ cryptomonnaieAffiche.GBP }}</li>
 				</ul>
 			</div>	
-		</div>
-	</div>
-
+		    </div>
+        </div>  
+</div>
 
     
     
@@ -97,9 +130,8 @@
                   resultat: null,
                   cryptomonnaie: null,
                   recherche1: "BTC",
-                  // recherche2: $.post("search")
-                }
-                
+                  recherche2: "ETH" 
+                }  
             },
 
             filters: {
@@ -109,19 +141,18 @@
             },
 
             mounted () {
-                axios
-                // le but est de lier recherche1 avec la barre de recherche mais je n'y arrive pas avec v-model
-                .get("https://min-api.cryptocompare.com/data/pricemulti?fsyms="+this.recherche1+",ETH&tsyms=USD,EUR,GBP")
-                .then(response => (this.resultat = response.data))
+                axios  
+                .get('https://min-api.cryptocompare.com/data/blockchain/list?api_key=13310ecb3c4145754a4f3f4b010ca9b8b3138552fcc7c4fbf4e444f12b85575d')
+                .then(response2 => (this.cryptomonnaie = response2.data))
             },
 
-            // ici je voudrais faire un deuxième appelle d'API pour pouvoir faire une barre de recherche qui s'autocomplemente avec toute les cryptomonnaie de l'API
-           /* mounted () {  
-                axios  
-                .get('https://min-api.cryptocompare.com/data/blockchain/list')
-                .then(response2 => (this.cryptomonnaie = response2.symbol))
-
-            }*/
+            methods: {
+                recherche: function() {
+                    axios
+                    .get( "https://min-api.cryptocompare.com/data/pricemulti?fsyms="+ this.recherche1 +","+ this.recherche2 +"&tsyms=USD,EUR,GBP")
+                    .then(response => (this.resultat = response.data))
+                }
+            }
         });
 </script>
 </body>
